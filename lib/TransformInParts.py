@@ -12,9 +12,6 @@ class TransformInParts(AnimGroup):
         trs_keywords: Iterable[dict] = ({},),
         **kwargs
     ):
-        # assert all(isinstance(i, Item) for i in source)
-        # assert all(isinstance(i, Item) for i in target)
-        # assert len(source) == len(target)
         t = trs_keywords
         t = t if type(t) is not dict else (t,)
 
@@ -32,7 +29,6 @@ class TransformInParts(AnimGroup):
                 anims.append(Transform(
                     s, t, **next(cycle_keywords)))
         else:
-            # params = {'move_durations', 'move_keywords', 'movtrs_keywords'}
             anims = self.from_moved(
                 source, target, trs_keywords, **kwargs)
         super().__init__(*anims, **kwargs)
@@ -72,7 +68,6 @@ class TransformInParts(AnimGroup):
                 Transform(st, t, **next(tk)),
                 **joint_keywords
             ))
-        # print(kwargs)
         return AnimGroup(*anims, **kwargs)
 
     @classmethod
@@ -113,7 +108,7 @@ class TransformInParts(AnimGroup):
         assert isinstance(t, MyTypst)
 
         # 每段动画的整理不影响下一段动画
-        s_pats, t_pats = cls.assimilation(s_patterns, t_patterns)
+        s_pats, t_pats = cls._assimilation(s_patterns, t_patterns)
 
         s_parts = s.get(flatten(s.multi_slices(*s_pats)), gapless)
         t_parts = t.get(flatten(t.multi_slices(*t_pats)), gapless)
@@ -124,7 +119,7 @@ class TransformInParts(AnimGroup):
             return cls(s_parts, t_parts, **kwargs)
 
     @classmethod
-    def assimilation(cls, pattern0, pattern1):
+    def _assimilation(cls, pattern0, pattern1):
         # Handle cases where one of the patterns is None, empty list or Ellipsis
         if pattern0 in (None, [], ...):
             pattern0 = (pattern1 := tuple(pattern1))
@@ -132,7 +127,7 @@ class TransformInParts(AnimGroup):
             pattern1 = (pattern0 := tuple(pattern0))
 
         merged_patterns = [
-            cls.merge_items(*cls.merge_items(item0, item1))
+            cls._merge_items(*cls._merge_items(item0, item1))
             for item0, item1 in zip(pattern0, pattern1)
         ]
 
@@ -140,7 +135,7 @@ class TransformInParts(AnimGroup):
         return zip(*merged_patterns)
 
     @staticmethod
-    def merge_items(item0: tuple, item1: tuple):
+    def _merge_items(item0: tuple, item1: tuple):
         '''merge item0 from item1, and then swap them.
         use it twice to merge them each other.'''
 
@@ -168,8 +163,6 @@ class TransformInParts(AnimGroup):
         target_patterns: Iterable[str] | types.EllipsisType = ...,
         source_indices: Iterable[int] | types.EllipsisType = [0],
         target_indices: Iterable[int] | types.EllipsisType = [...],
-        # durations: Iterable[int] = None,
-        # trs_keywords: Iterable[dict] = None,
         **anim_kwargs
     ):
         sp = source_patterns
@@ -183,7 +176,6 @@ class TransformInParts(AnimGroup):
         return cls.matching_patterns(
             (source, zip(sp, it.cycle(source_indices))),
             (target, zip(tp, it.cycle(target_indices))),
-            # durations=durations, trs_keywords=trs_keywords,
             **anim_kwargs)
 
 
