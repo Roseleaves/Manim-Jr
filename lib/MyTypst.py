@@ -1,40 +1,5 @@
 from janim.imports import *
 
-def get_between(string: str, first: str = None, last: str = None,
-                include_first: bool = False, include_last: bool = False) -> str:
-    '''
-    Extracts a substring from 'string' that is between the substrings 'first' and 'last'.
-
-    Parameters:
-        string (str): The main string to search within.
-        first (str, optional): The starting delimiter string. Defaults to None.
-        last (str, optional): The ending delimiter string. Defaults to None.
-        include_first (bool, optional): If True, include 'first' in the result. Defaults to False.
-        include_last (bool, optional): If True, include 'last' in the result. Defaults to False.
-
-    Returns:
-        str: The extracted substring between 'first' and 'last', or an empty string if delimiters are not found.
-    '''
-
-    # Determine the start position
-    start = string.find(first) if first else 0
-    if start == -1:
-        return ''  # Return empty string if 'first' is not found
-
-    if not include_first:
-        start += len(first)
-
-    # Determine the end position
-    end = string.find(last, start) if last else len(string)
-    if end == -1:
-        return ''  # Return empty string if 'last' is not found
-
-    if include_last:
-        end += len(last)
-
-    return string[start:end]
-
-
 def flatten(iterable):
     if not isinstance(iterable, (list, tuple)):
         return iterable,
