@@ -54,7 +54,13 @@ This method finds the slices corresponding to the occurrence of a pattern.
   - `ordinal`: The ordinal number indicating the nth occurrence of the pattern.
 
 - **Behavior**:
-  - It searches the document for the specified pattern and ordinal number and returns the slice.
+  - First, check if the pattern is an empty pattern; if so, return a slice of the entire data.
+    - If pattern is a string, convert it into a MyTypst object.
+  - Use self.indices(pat) to find all positions where the pattern matches.
+  - Depending on the type of ordinal, decide how to generate slices:
+    - If ordinal is a valid integer less than the number of match positions, return a single slice at the specified position.
+    - If ordinal is unspecified or represents an empty pattern and there is only one match position, return a slice at that position; if there are multiple match positions, return a list of slices for each match.
+    - If ordinal is a list, generate a slice for each position in the list.
 
 #### `get`
 This method extracts the specified part of the document.
@@ -64,6 +70,14 @@ This method extracts the specified part of the document.
 
 - **Behavior**:
   - It uses the provided slice to extract the corresponding part of the document.
+  - If gapless is False:
+    - If slices is a slice object, the method returns the data sliced according to this single slice.
+    - If slices is a sequence of multiple slices, the method iterates over each slice, calling self.get(i) recursively to get the corresponding fragment, and appends these fragments to the fragments list.
+  - If gapless is True:
+    - Initialize a set indices with the starting index 0 and the length of the data.
+    - Iterate over the flattened slices, ensuring each element is a slice type, and update the indices set with the start and stop indices of each slice.
+    - Sort the indices and create pairs of adjacent indices to form slices.
+    - Return a list of fragments based on these slices.
 
 ### Summary
 The `MyTypst` class provides a rich set of features for accessing and manipulating documents. It supports various forms of indexing, including integer indices, slices, boolean masks, and pattern-based indexing. The `__getitem__` method is the core of this functionality, allowing users to easily access specific parts of the document or search for patterns within the document. The additional methods (`multi_slices`, `slices`, `get`, and `_with_empty`) support the functionality provided by `__getitem__` and enable more complex operations on the document.
